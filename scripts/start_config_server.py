@@ -3,7 +3,7 @@
 import rospy
 
 from dynamic_reconfigure.server import Server
-from birl_config.cfg import MultiModalConfig, hmmlearnConfig
+from birl_config.cfg import MultiModalConfig, hmmlearnConfig, bnpyConfig
 
 def callback(config, level):
     rospy.loginfo("config: %s, level %s."%(config, level))
@@ -14,4 +14,5 @@ if __name__ == "__main__":
 
     srv = Server(MultiModalConfig, callback, namespace='/birl_config/modality_config')
     srv = Server(hmmlearnConfig, callback, namespace='/birl_config/introspection_model_config/HMM/hmmlearn')
+    srv = Server(bnpyConfig, callback, namespace='/birl_config/introspection_model_config/HMM/bnpy')
     rospy.spin()
