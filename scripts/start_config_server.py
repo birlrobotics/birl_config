@@ -3,6 +3,8 @@
 import rospy
 import json
 import os
+import ipdb
+import copy
 
 dir_of_this_script = os.path.dirname(os.path.realpath(__file__))
 
@@ -15,12 +17,24 @@ def get_json_path(cfg_name):
     )
     return json_path
 
+def safe_update_dict(a, b):
+    for key in b:
+        if key in a:
+            if type(a[key]) == type(b[key]):
+                if type(a[key])==dict: 
+                    safe_update_dict(a[key], b[key])
+                else:
+                    a[key]=b[key]
+             
+
 def update_old_config_if_exists(server, cfg_name):
     json_path = get_json_path(cfg_name)
     if os.path.isfile(json_path):
         try:
-            config = json.load(open(json_path, 'r'))
-            server.update_configuration(config)
+            old_config = json.load(open(json_path, 'r'))
+            now_config = copy.deepcopy(server.config)
+            safe_update_dict(now_config, old_config) 
+            server.update_configuration(now_config)
         except IOError as e:
             print "Reading json config failed, I/O error({0}): {1}".format(e.errno, e.strerror)
 
